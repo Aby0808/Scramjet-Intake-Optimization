@@ -1,24 +1,22 @@
 
 % this script generates the ramps from the optimized ramp
 
-global FRSTM_TH_PARAM
-
 % Constants
-alpha = FRSTM_TH_PARAM(1);  % angle of attack
-M_oo = FRSTM_TH_PARAM(2);   % freestream mach
-P_oo = FRSTM_TH_PARAM(3);   % freestream pressure
-T_oo = FRSTM_TH_PARAM(4);   % freestream temperature
-% M_th = 2.1;
-m_dot = FRSTM_TH_PARAM(5);  % required mass flow rate
-h_th = FRSTM_TH_PARAM(6);   % required throat height
-T_th = FRSTM_TH_PARAM(7);   % approx desired pressure ratio
+gamma = 1.4;
+R = 287;
+M_oo = 6.5;
+P_oo = 1171;
+T_oo = 279;
+M_th = 2.5;
+m_dot = 18.7;
+PR_th = 100;
 
-index = 162;  % replace the number with the index of the configuration needed
+index = 74;
 ramp_theta = x(index,:);
 
 
-[obj_fn_val, ramp_coord, coord_ramp1,~] = FUN_objective_function(alpha, M_oo, P_oo, T_oo,...
-    m_dot, h_th, T_th, ramp_theta, 'y',10);
+[obj_fn_val, ramp_coord, coord_ramp1] = FUN_objective_function(gamma, R, M_oo, P_oo, T_oo, M_th,...
+    m_dot, PR_th, ramp_theta, x(index,end), 'y');
 
 
 figure

@@ -2,8 +2,6 @@ function [value] = FUN_oblique_shock_prop_ratio(gamma, M, theta, parameter)
 % oblique_shock_ratios: Computes the pressure and temperature ratios across an oblique shock.
 
 % Compute beta (shock angle) using the existing function
-% M
-% theta
 beta = FUN_oblique_shock(gamma, M, theta, 'beta');
 
 % Compute normal Mach number (Mn1)
