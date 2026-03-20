@@ -13,14 +13,14 @@ if isempty(BL_SHAPE_PARAM) || isempty(FRSTM_TH_PARAM)
     FUN_setup_globals_fast(BL, FR);   % will pull from cached getters on client or you can pass BL/FR in
 end
 
-alpha = FRSTM_TH_PARAM(1);
-M_oo = FRSTM_TH_PARAM(2);
-P_oo = FRSTM_TH_PARAM(3);
-T_oo = FRSTM_TH_PARAM(4);
+alpha = FRSTM_TH_PARAM.alpha;
+M_oo = FRSTM_TH_PARAM.M_oo;
+P_oo = FRSTM_TH_PARAM.P_oo;
+T_oo = FRSTM_TH_PARAM.T_oo;
 % M_th = 2.1;
-m_dot = FRSTM_TH_PARAM(5);
-h_th = FRSTM_TH_PARAM(6);
-T_th = FRSTM_TH_PARAM(7);
+m_dot = FRSTM_TH_PARAM.m_dot;
+h_th = FRSTM_TH_PARAM.h_th;
+T_th = FRSTM_TH_PARAM.T_th;
 % PR_th = 120;
 
 %% ---- compute -----

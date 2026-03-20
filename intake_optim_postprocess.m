@@ -2,28 +2,29 @@
 % close all
 % clc
 clear
+projectPaths = setup_project_paths();
 
 %% Load neccessary data
 % load bl shape paramenter tables
 global BL_SHAPE_PARAM FRSTM_TH_PARAM
 
-BL_SHAPE_PARAM = table2array(readtable("bl_shap_param.dat"));
+BL_SHAPE_PARAM = table2array(readtable(fullfile(projectPaths.dataDir, "bl_shap_param.dat")));
 
 % Load the optimized results
-load('optimization_results_w_int_constraints.mat'); % Contains x (designs) and fval (objective values)
+load(fullfile(projectPaths.resultsDir, 'optimization_results_w_int_constraints.mat')); % Contains x (designs) and fval (objective values)
 
 % Load the freestream and some fixed throat requirements
 
 FRSTM_TH_PARAM = FUN_set_freestream_throat_params();
 
-alpha = FRSTM_TH_PARAM(1);
-M_oo = FRSTM_TH_PARAM(2);
-P_oo = FRSTM_TH_PARAM(3);
-T_oo = FRSTM_TH_PARAM(4);
+alpha = FRSTM_TH_PARAM.alpha;
+M_oo = FRSTM_TH_PARAM.M_oo;
+P_oo = FRSTM_TH_PARAM.P_oo;
+T_oo = FRSTM_TH_PARAM.T_oo;
 % M_th = 2.1;
-m_dot = FRSTM_TH_PARAM(5);
-h_th = FRSTM_TH_PARAM(6);
-T_th = FRSTM_TH_PARAM(7);
+m_dot = FRSTM_TH_PARAM.m_dot;
+h_th = FRSTM_TH_PARAM.h_th;
+T_th = FRSTM_TH_PARAM.T_th;
 
 %% Extract parameters for comparison
 

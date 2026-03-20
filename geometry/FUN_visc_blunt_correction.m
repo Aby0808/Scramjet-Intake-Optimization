@@ -4,11 +4,14 @@ function [ramp_param1, ramp_coord1, Tmdot, Mmdot, wdt_cwl] = FUN_visc_blunt_corr
 global BL_SHAPE_PARAM FRSTM_TH_PARAM
 
 if isempty(BL_SHAPE_PARAM) || isempty(FRSTM_TH_PARAM)
-    setup_globals_fast();   % will pull from cached getters on client or you can pass BL/FR in
+    paths = setup_project_paths();
+    BL = table2array(readtable(fullfile(paths.dataDir, 'bl_shap_param.dat')));
+    FR = FUN_set_freestream_throat_params();
+    FUN_setup_globals_fast(BL, FR);
 end
 
-P_oo = FRSTM_TH_PARAM(3);
-T_oo = FRSTM_TH_PARAM(4);
+P_oo = FRSTM_TH_PARAM.P_oo;
+T_oo = FRSTM_TH_PARAM.T_oo;
 
 R = 0.005; %blunt radius
 
@@ -331,3 +334,5 @@ if post == 'y'
     axis equal
 end
 end
+
+
