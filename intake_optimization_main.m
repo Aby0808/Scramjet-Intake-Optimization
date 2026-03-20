@@ -12,6 +12,8 @@ clc
 clear
 close all
 
+projectPaths = setup_project_paths();
+
 clear get_BL_SHAPE_PARAM get_FRSTM_TH_PARAM  % clear all getters
 clear functions                              % clear all function caches
 
@@ -23,11 +25,11 @@ pool = parpool(8);                           % start fresh pool
 
 % Make sure workers can see the helper and data
 addAttachedFiles(pool, { ...
-    'FUN_setup_globals_fast.m', ...              % helper to set globals on workers
-    'FUN_set_freestream_throat_params.m', ...
-    'FUN_get_prop_NASA9.m', ...
-    'FUN_evaluateObjectives.m', ...
-    'bl_shap_param.dat' });
+    fullfile(projectPaths.optimizationDir, 'FUN_setup_globals_fast.m'), ...  % helper to set globals on workers
+    fullfile(projectPaths.optimizationDir, 'FUN_set_freestream_throat_params.m'), ...
+    fullfile(projectPaths.thermoDir, 'FUN_get_prop_NASA9.m'), ...
+    fullfile(projectPaths.optimizationDir, 'FUN_evaluateObjectives.m'), ...
+    fullfile(projectPaths.dataDir, 'bl_shap_param.dat') });
 
 % ---------- build params ON CLIENT (fast, cached) ----------
 BL = get_BL_SHAPE_PARAM();                   % reads .dat once per session
@@ -81,11 +83,11 @@ end
 [x, fval] = gamultiobj(@FUN_evaluateObjectives, 4, [], [], [], [], lb, ub, options);
 
 % ---------- persist results + params for post-processing ----------
-save('optimization_results.mat', 'x', 'fval');
+save(fullfile(projectPaths.resultsDir, 'optimization_results.mat'), 'x', 'fval');
 
 params.BL = BL;
 params.FR = FR;
-save('run_params.mat','-struct','params');   % tiny MAT to reuse same freestream/throat
+save(fullfile(projectPaths.resultsDir, 'run_params.mat'),'-struct','params');   % tiny MAT to reuse same freestream/throat
 
 % ---------- cleanup ----------
 delete(gcp('nocreate'));
@@ -96,8 +98,8 @@ function BL = get_BL_SHAPE_PARAM()
 % Cached loader for boundary-layer shape parameters (worker-safe on client)
     persistent BL_cached
     if isempty(BL_cached)
-        here = fileparts(mfilename('fullpath'));
-        dat  = fullfile(here,'bl_shap_param.dat');
+        paths = setup_project_paths();
+        dat  = fullfile(paths.dataDir,'bl_shap_param.dat');
         BL_cached = table2array(readtable(dat));
     end
     BL = BL_cached;
