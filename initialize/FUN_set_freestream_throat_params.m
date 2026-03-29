@@ -6,13 +6,13 @@ function param = FUN_set_freestream_throat_params()
 % this function should be called in the beginning of main and postprocess program
 % set params here
 
-alpha = 4;
-M_oo = 6.5;
+alpha = 2;
+M_oo = 7.0;
 P_oo = 1172;    %Pa
 T_oo = 226.65;  %K
-m_dot = 18.7;   %kg/s
-h_th = 0.054;   %m
-T_th = 1150;    %K
+m_dot = 10;   %kg/s
+h_th = 0.06;   %m
+T_th = 1000;    %K
 
 param = struct( ...
     'alpha', alpha, ...

@@ -20,6 +20,8 @@ u_oo = M_oo*sqrt(FUN_get_prop_NASA9(T_oo,'gamma')*287*T_oo);
 % stagnation properties are not coming properly
 
 penalty = [10^5, -10^5];  % penalty to be returned for undesired flowfield
+showPostprocessOutput = (post == 'y');
+computePostFlag = 'n';
 
 result = buildFailureResult(penalty);
 ramp_prop = zeros(5,6);
@@ -158,22 +160,30 @@ try
     end
 
     %% geometry generation, viscous/blunt corrections, and aero forces
+    % Keep post-processing output disabled during the first evaluation pass.
+    % This ensures infeasible designs stay silent even if the caller asked
+    % for post-processing-style output.
     [L,D,ramp_param, ramp_coord,coord_ramp1,Tth,Mth,wdt_in,wdt_cwl,lng_in, SI] = ...
-        FUN_generate_ramp(alpha, M_oo, P_oo, T_oo, ramp_prop, h_th, m_dot, post, config_param);
+        FUN_generate_ramp(alpha, M_oo, P_oo, T_oo, ramp_prop, h_th, m_dot, computePostFlag, config_param);
 
     % Extracting PR, Tth, Mth, length, L/D, SI
     % will be used only for postprocess
     postprocess = [ramp_param(5,4)/P_oo, Tth, Mth, lng_in, L/D, SI];
 
-    %% reporting block for post-processing runs
-    if post=='y'
-        FUN_print_design_summary(P_oo, T_oo, P0_oo, ramp_param, Tth, Mth, D, L, lng_in, wdt_in, wdt_cwl, SI)
-    end
-
     %% hard constraints and final objective packaging
     % constraint on length and throat temperature
-    % if (lng_in <= 4 && ramp_param(5,5)/T_oo >= 0.9*TR_th) || post=='y'
-    if (Tth >= T_t && lng_in <= 4) || post=='y'
+    % if (lng_in <= 4 && ramp_param(5,5)/T_oo >= 0.9*TR_th)
+    if Tth >= T_t && lng_in <= 4
+        % Only feasible designs should produce post-processing output.
+        % If plotting/reporting is requested, rerun once with the post flag
+        % enabled so the computational pipeline stays unchanged.
+        if showPostprocessOutput
+            [L,D,ramp_param, ramp_coord,coord_ramp1,Tth,Mth,wdt_in,wdt_cwl,lng_in, SI] = ...
+                FUN_generate_ramp(alpha, M_oo, P_oo, T_oo, ramp_prop, h_th, m_dot, post, config_param);
+            postprocess = [ramp_param(5,4)/P_oo, Tth, Mth, lng_in, L/D, SI];
+            FUN_print_design_summary(P_oo, T_oo, P0_oo, ramp_param, Tth, Mth, D, L, lng_in, wdt_in, wdt_cwl, SI)
+        end
+
         result = struct( ...
             'objectiveFunction', [D, ramp_param(5,6)/P0_oo], ...
             'rampCoord', ramp_coord, ...
@@ -213,6 +223,9 @@ if nargin < 3
     failureStage = "";
 end
 
+% failureReason/failureStage are retained only as silent diagnostic metadata.
+% They are useful when debugging or checking regressions, but they are not
+% part of the optimization output and are not printed during normal runs.
 result = struct( ...
     'objectiveFunction', penalty, ...
     'rampCoord', 0, ...
